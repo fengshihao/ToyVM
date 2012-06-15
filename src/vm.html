@@ -1,0 +1,80 @@
+<html>
+<script type="text/javascript">
+
+function VM(opcode){
+	var stack = [];
+	var sp = 0;
+	var symbl = {};
+	for(var ip = 0; ip < opcode.length; ip++)
+	{
+		var cmd = opcode[ip];
+		switch(cmd[0])
+		{
+			case 'add':
+				sp -= 1;
+				stack[sp-1] += stack[sp];
+				break;
+			case 'sub':
+				sp -= 1;
+				stack[sp-1] -= stack[sp];
+				break;
+			case 'push': 
+				stack[sp] = cmd[1];
+				sp += 1;
+				break;
+			case 'store': 
+				sp -= 1;
+				symbl[cmd[1]] = stack[sp];
+				break;
+			case 'load': 
+				stack[sp] = symbl[cmd[1]];
+				sp += 1;
+				break;
+			default: break;
+		}
+
+	}
+	return stack[0];
+}
+
+// 5+25-98
+var opcode = [
+				['push', 5], 
+				['push', 25], 
+			    ['add'],
+				['push', 98], 
+			    ['sub']
+			 ];
+// a = 9;
+// b = 8;
+// a - b;
+opcode = [
+				['push', 9], 
+				['store', 'a'], 
+				['push', 8], 
+				['store', 'b'], 
+				['load', 'a'], 
+				['load', 'b'], 
+			    ['sub']
+			 ];
+// a = 9;
+// if(true) { a = 10;} else {a = 8;}
+
+opcode = [
+				['push', 5], 
+				['store', 'a'], 
+				['push', true], 
+			    ['add'],
+				['push', 98], 
+			    ['sub']
+			 ];
+
+
+console.log('=================================================================================\n\n');
+var ret = VM(opcode);
+console.log('run ret = ' + ret);
+console.log('=================================================================================\n\n');
+
+</script>
+
+</html>
