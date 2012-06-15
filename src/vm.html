@@ -5,29 +5,51 @@ function VM(opcode){
 	var stack = [];
 	var sp = 0;
 	var symbl = {};
-	for(var ip = 0; ip < opcode.length; ip++)
+	for(var ip = 0; ip < opcode.length;) 
 	{
 		var cmd = opcode[ip];
 		switch(cmd[0])
 		{
+			case 'jmp':
+				ip = cmd[1];
+				break;
+			case 'jmpt':
+				sp -= 1;
+				if(stack[sp])
+				{
+					ip = cmd[1];
+				}else{
+					ip++;
+				}
+				break;
+			case 'lt':
+				sp -= 1;
+				stack[sp-1] = stack[sp-1] < stack[sp];
+				ip++;
+				break;
 			case 'add':
 				sp -= 1;
 				stack[sp-1] += stack[sp];
+				ip++;
 				break;
 			case 'sub':
 				sp -= 1;
 				stack[sp-1] -= stack[sp];
+				ip++;
 				break;
 			case 'push': 
 				stack[sp] = cmd[1];
 				sp += 1;
+				ip++;
 				break;
 			case 'store': 
 				sp -= 1;
 				symbl[cmd[1]] = stack[sp];
+				ip++;
 				break;
 			case 'load': 
 				stack[sp] = symbl[cmd[1]];
+				ip++;
 				sp += 1;
 				break;
 			default: break;
@@ -58,15 +80,21 @@ opcode = [
 			    ['sub']
 			 ];
 // a = 9;
-// if(true) { a = 10;} else {a = 8;}
+// if(a < 5) { a = 10;} else {a = 8;}
 
 opcode = [
-				['push', 5], 
+				['push', 3], 
 				['store', 'a'], 
-				['push', true], 
-			    ['add'],
-				['push', 98], 
-			    ['sub']
+				['load', 'a'], 
+				['push', 5], 
+			    ['lt'],
+				['jmpt', 9], 
+			    ['push', 8],
+				['store', 'a'], 
+				['jmp', 11], 
+			    ['push', 10],
+				['store', 'a'],
+				['load', 'a'] 
 			 ];
 
 
